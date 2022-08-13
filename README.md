@@ -1,58 +1,30 @@
-# How to host Swagger API documentation with GitHub Pages
-[<img alt="The blog of Peter Evans: How to Host Swagger Documentation With Github Pages" title="View blog post" src="https://peterevans.dev/img/blog-published-badge.svg">](https://peterevans.dev/posts/how-to-host-swagger-docs-with-github-pages/)
+# LinkJapan eLife OpenAPI
 
-This repository is a template for using the [Swagger UI](https://github.com/swagger-api/swagger-ui) to dynamically generate beautiful documentation for your API and host it for free with GitHub Pages.
+This repo explains how to access the API used smarthome devices that connect to the LinkJapan eLink ecosystem.  Normally, these devices can only be controlled using a voice assistant or via the vendor's [HomeLink](https://play.google.com/store/apps/details?id=jp.co.linkjapan.elife&hl=en&gl=US) app (also available for iOS).
 
-The template will periodically auto-update the Swagger UI dependency and create a pull request. See the [GitHub Actions workflow here](.github/workflows/update-swagger.yml).
+However, through some careful examination of the vendor's software, we can figure out how the API works. Unfortunately, this doesn't yet let you run these devices without using the vendor's cloud services (e.g., completely disconnected from the internet) - that's something that I'd like to figure out in the future.  Rather, we're just mimicking the API calls made by the app itself.
 
-The example API specification used by this repository can be seen hosted at [https://peter-evans.github.io/swagger-github-pages](https://peter-evans.github.io/swagger-github-pages/).
+This repository and its maintainers are not affiliated with LinkJapan, etc.  This repository and its maintainers give no warranty and accept no responsibility or liability for the accuracy or the completeness of the information and materials contained in the repository.
 
-## Steps to use this template
+## Devices tested
 
-1. Click the `Use this template` button above to create a new repository from this template.
+- [Iris Ohyama SMT-PL1 Smart Plug](https://amzn.to/3JSZnDR)
+- [Iris Ohyama SMT-RC1 Smart Remote Control](https://amzn.to/3AkdT4D)
 
-2. Go to the settings for your repository at `https://github.com/{github-username}/{repository-name}/settings` and enable GitHub Pages.
+## API
 
-    ![Headers](/screenshots/swagger-github-pages.png?raw=true)
-    
-3. Browse to the Swagger documentation at `https://{github-username}.github.io/{repository-name}/`.
+[LinkJapan eLife OpenAPI documentation](https://hungyao.github.io/elink-openapi)
 
+## Examining the code
 
-## Steps to manually configure in your own repository
+To proceed here, you need to obtain the APK somehow (either from your Android device, or from some APK mirroring service).  Once you do, proceed with the steps below:
 
-1. Download the latest stable release of the Swagger UI [here](https://github.com/swagger-api/swagger-ui/releases).
+```
+# Extract class files to be read with a Java class decompiler.
+d2j-dex2jar -f path_to_homelink.apk
+# Then open the resulting jar with https://github.com/java-decompiler/jd-gui
 
-2. Extract the contents and copy the "dist" directory to the root of your repository.
-
-3. Move the file "index.html" from the directory "dist" to the root of your repository.
-    ```
-    mv dist/index.html .
-    ```
-    
-4. Copy the YAML specification file for your API to the root of your repository.
-
-5. Edit [index.html](index.html) and change the `url` property to reference your local YAML file. 
-    ```javascript
-        const ui = SwaggerUIBundle({
-            url: "swagger.yaml",
-        ...
-    ```
-    Then fix any references to files in the "dist" directory.
-    ```html
-    ...
-    <link rel="stylesheet" type="text/css" href="dist/swagger-ui.css" >
-    <link rel="icon" type="image/png" href="dist/favicon-32x32.png" sizes="32x32" />
-    <link rel="icon" type="image/png" href="dist/favicon-16x16.png" sizes="16x16" />    
-    ...
-    <script src="dist/swagger-ui-bundle.js"> </script>
-    <script src="dist/swagger-ui-standalone-preset.js"> </script>    
-    ...
-    ```
-    
-6. Go to the settings for your repository at `https://github.com/{github-username}/{repository-name}/settings` and enable GitHub Pages.
-
-    ![Headers](/screenshots/swagger-github-pages.png?raw=true)
-    
-7. Browse to the Swagger documentation at `https://{github-username}.github.io/{repository-name}/`.
-
-   The example API specification used by this repository can be seen hosted at [https://peter-evans.github.io/swagger-github-pages](https://peter-evans.github.io/swagger-github-pages/).
+# Extract the react native code.
+apktool d path_to_homelink.apk
+npx react-native-decompiler -i path_to_homelink_apk/assets/index.android.bundle -o ./output
+```

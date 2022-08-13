@@ -1,0 +1,609 @@
+openapi: 3.0.3
+info:
+  title: LinkJapan - eLife API
+  description: |-
+    This is a reverse engineering of the LinkJapan eLife API
+    
+    Some useful links:
+    - [LinkJapan eLife](https://linkjapan.co.jp/elife/)
+    - [HomeLink app](https://linkjapan.co.jp/appehome/)
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: https://elife-api.aiscloud.linkjapan.co.jp/api/elife
+tags:
+  - name: account
+    description: Everything about your account
+  - name: family
+    description: Everything about your family
+  - name: device
+    description: Everything about your devices
+  - name: smartplug
+    description: Control your smart plug such as the Iris Ohyama SMT-PL1
+
+paths:
+  /account/login:
+    post:
+      tags:
+        - account
+      summary: Login to an existing account
+      requestBody:
+        description: Login to an existing account
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+  /family:
+    get:
+      tags:
+        - family
+      summary: List all families
+      responses:
+        '200':
+          description: Successful retrieval
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Family'
+      security:
+        - bearer_auth: []
+        
+  /family/{familyId}:
+    get:
+      tags:
+        - family
+      summary: Find family by ID
+      description: Returns a single family
+      parameters:
+        - name: familyId
+          in: path
+          description: ID of family to return
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful retrieval
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Family'
+      security:
+        - bearer_auth: []
+  
+  /device:
+    get:
+      tags:
+        - device
+      summary: List all devices
+      parameters:
+        - name: familyId
+          in: query
+          description: Family to get devices for
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful retrieval
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+      security:
+        - bearer_auth: []
+
+  /device/{deviceId}:
+    get:
+      tags:
+        - device
+      summary: Find device by ID
+      description: Returns a single device
+      parameters:
+        - name: deviceId
+          in: path
+          description: ID of the device to return
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful retrieval
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+      security:
+        - bearer_auth: []
+
+  /device/{deviceId}/online:
+    get:
+      tags:
+        - device
+      summary: Check whether a device is online
+      parameters:
+        - name: deviceId
+          in: path
+          description: ID of the device to check
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful retrieval
+          content:
+            application/json:
+              schema:
+                type: boolean
+                example: true
+      security:
+        - bearer_auth: []
+
+  /device/{deviceId}/data:
+    get:
+      tags:
+        - device
+      summary: Get the data of a device
+      description: Returns the data for a single device
+      parameters:
+        - name: deviceId
+          in: path
+          description: ID of the device to get data for
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful retrieval
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceData'
+      security:
+        - bearer_auth: []
+
+  /device/{deviceId}/history:
+    get:
+      tags:
+        - device
+      summary: Get the history of a device
+      description: Returns the history for a single device
+      parameters:
+        - name: deviceId
+          in: path
+          description: ID of the device to get data for
+          required: true
+          schema:
+            type: string
+        - name: from
+          in: query
+          description: Lower bound of the history data to get
+          required: true
+          schema:
+            type: string
+            format: date-time
+            example: "2022-01-01T00:00:00.000Z"
+        - name: to
+          in: query
+          description: Upper bound of the history data to get
+          required: true
+          schema:
+            type: string
+            format: date-time
+            example: "2022-06-01T00:00:00.000Z"
+        - name: field
+          in: query
+          description: Field of the history data to get
+          required: true
+          schema:
+            type: string
+            enum: [buy, doorsensor_status, envtemp, envhumid, envlux, pir_detected, keypressed, tempsensor, humsensor, totalconsum, temp_value_, humidity_value_, co2_value_, va_temperature, va_humidity]
+      responses:
+        '200':
+          description: Successful retrieval
+          content:
+            application/json:
+              schema:
+                type: object
+      security:
+        - bearer_auth: []
+
+  /broadlink/opencontrol:
+    post:
+      tags:
+        - smartplug
+      summary: Control a smart plug
+      description: Turn the smart plug on or off
+      requestBody:
+        description: Control request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OpenControlRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful control
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenControlResponse'
+      security:
+        - bearer_auth: []
+          broadlink_license_auth: []
+  
+  /broadlink/firmware:
+    post:
+      tags:
+        - smartplug
+      summary: Get the firmware version of a smartplug
+      requestBody:
+        description: Control request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FirmwareRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful read of firmware version
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FirmwareResponse'
+      security:
+        - bearer_auth: []
+
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        app:
+          type: string
+      example:
+        email: "user@example.com"
+        password: "mypassword"
+        app: "HomeLink"
+    LoginResponse:
+      type: object
+      properties:
+        app:
+          type: string
+        company:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        email:
+          type: string
+        id:
+          type: string
+        lastLoginAt:
+          type: string
+        name:
+          type: string
+        parentAccountId:
+          type: string
+        permissions:
+          type: string
+        token:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+      example:
+        app: "HomeLink"
+        company: null
+        createdAt: "2022-08-01T00:00:00.000Z"
+        email: "user@example.com"
+        id: "000000000000000000000001"
+        lastLoginAt: "2022-08-01T00:00:00.000Z"
+        name: ""
+        parentAccountId: null
+        permissions: null
+        token: "00000000000000000006"
+        updatedAt: "2022-08-01T00:00:00.000Z"
+          
+    Family:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        buildingId:
+          type: string
+        userId:
+          type: string
+        app:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      example:
+        id: "000000000000000000000002"
+        name: "My Family"
+        buildingId: null
+        userId: "000000000000000000000001"
+        app: null
+        createdAt: "2022-08-01T00:00:00.000Z"
+        updatedAt: "2022-08-01T00:00:00.000Z"
+    Device:
+      type: object
+      properties:
+        accessoryOrders:
+          type: string
+        appearance:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        did:
+          type: string
+        familyId:
+          type: string
+        hidden:
+          type: string
+          example: null
+        id:
+          type: string
+        linked:
+          type: boolean
+          example: false
+        name:
+          type: string
+        order:
+          type: string
+          example: null
+        parentId:
+          type: string
+          example: null
+        pid:
+          type: string
+        roomId:
+          type: string
+        setting:
+          type: string
+          example: null
+        updatedAt:
+          type: string
+          format: date-time
+        userId:
+          type: string
+        vendor:
+          type: string
+      example:
+        accessoryOrders: null
+        appearance: null
+        createdAt: "2022-08-01T00:00:00.000Z"
+        did: "00000000000000000000000000000004"
+        familyId: "000000000000000000000002"
+        hidden: null
+        id: "000000000000000000000007"
+        linked: false
+        name: "My Device"
+        order: null
+        parentId: null
+        pid: "00000000000000000000000000000005"
+        roomId: "000000000000000000000003"
+        setting: null
+        updatedAt: "2022-08-01T00:00:00.000Z"
+        userId: "000000000000000000000002"
+        vendor: "broadlink"
+    DeviceData:
+      type: object
+      properties:
+        Data:
+          type: object
+          properties:
+            indicator:
+              type: number
+            last_updated:
+              type: string
+            maxworktime:
+              type: number
+            pwr:
+              type: number
+        Did:
+          type: string
+        Pid:
+          type: string
+      example:
+        Data:
+          indicator: 1
+          last_updated: "2022-08-01T00:00:00.000Z"
+          maxworktime: 0
+          pwr: 0
+        Did: "00000000000000000000000000000004"
+        Pid: "00000000000000000000000000000005"
+    OpenControlRequest:
+      type: object
+      properties:
+        directive:
+          type: object
+          properties:
+            header:
+              type: object
+              properties:
+                namespace:
+                  type: string
+                  example: "DNA.KeyValueControl"
+                name:
+                  type: string
+                  example: "KeyValueControl"
+                interfaceVersion:
+                  type: string
+                  example: "2"
+                messageId:
+                  type: string
+                  example: "1bd5d003-31b9-476f-ad03-71d471922820"
+            endpoint:
+              $ref: '#/components/schemas/Endpoint'
+            payload:
+              $ref: '#/components/schemas/TriggerPower'
+    Endpoint:
+      type: object
+      properties:
+        devicePairedInfo:
+          type: object
+          properties:
+            did:
+              type: string
+              example: "00000000000000000000000000000004"
+            pid:
+              type: string
+              example: "00000000000000000000000000000005"
+            mac:
+              type: string
+              example: "00:00:00:00:00:00"
+            cookie:
+              type: string
+              format: byte
+              example: "base64encodedcookievalue"
+        endpointId:
+          type: string
+          example: "00000000000000000000000000000004"
+        cookie:
+          type: object
+          properties:
+            did:
+              type: string
+              example: "00000000000000000000000000000004"
+            pid:
+              type: string
+              example: "00000000000000000000000000000005"
+            sdid:
+              type: string
+              example: ""
+            spid:
+              type: string
+              example: ""
+    TriggerPower:
+      type: object
+      properties:
+        act:
+          type: string
+          example: 'set'
+        params:
+          type: array
+          items:
+            type: string
+            example: 'pwr'
+        vals:
+          type: array
+          items:
+            type: array
+            items:
+              type: object
+              properties:
+                val:
+                  type: number
+                  enum: [0, 1]
+                  description: >
+                    New value of the smart plug
+                    * `0` - Off
+                    * `1` - On
+                  example: 1
+                idx:
+                  type: number
+                  example: 1
+        
+    OpenControlResponse:
+      type: object
+      properties:
+        context:
+          type: object
+        event:
+          type: object
+          properties:
+            header:
+              type: object
+            payload:
+              type: object
+            endpoint:
+              type: object
+              properties:
+                endpointId:
+                  type: string
+                  example: "00000000000000000000000000000004"
+            
+    FirmwareRequest:
+      type: object
+      properties:
+        directive:
+          type: object
+          properties:
+            header:
+              type: object
+              properties:
+                namespace:
+                  type: string
+                  example: "DNA.ManagerControl"
+                name:
+                  type: string
+                  example: "QueryVersion"
+                interfaceVersion:
+                  type: string
+                  example: "1"
+                messageId:
+                  type: string
+                  example: "202008280001"
+            endpoint:
+              $ref: '#/components/schemas/Endpoint'
+            payload:
+              type: object
+              properties:
+                getServerVersion:
+                  type: boolean
+                  example: true
+    FirmwareResponse:
+      type: object
+      properties:
+        context:
+          type: object
+        event:
+          type: object
+          properties:
+            payload:
+              type: object
+              properties:
+                version:
+                  type: string
+                  
+        endpoint:
+          type: object
+          properties:
+            endpointId:
+              type: string
+        
+  securitySchemes:
+    bearer_auth:
+      type: http
+      scheme: bearer
+
+    broadlink_license_auth:
+      type: apiKey
+      in: query
+      name: license
