@@ -268,6 +268,349 @@ paths:
       security:
         - bearer_auth: []
 
+  /panel:
+    get:
+      tags:
+        - panel
+      summary: List panels
+      parameters:
+        - name: familyId
+          in: query
+          description: Family to filter timers
+          schema:
+            type: string
+        - name: deviceId
+          in: query
+          description: Device to filter timers
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful retrieval
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Panel'
+      security:
+        - bearer_auth: []
+    post:
+      tags:
+        - panel
+      summary: Create a panel
+      requestBody:
+        description: Create panel request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePanelRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Panel'
+      security:
+        - bearer_auth: []
+
+  /panel/{panelId}:
+    get:
+      tags:
+        - panel
+      summary: Get a panel
+      parameters:
+        - name: panelId
+          in: path
+          description: ID of panel to get
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful retrieval
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Panel'
+      security:
+        - bearer_auth: []
+    put:
+      tags:
+        - panel
+      summary: Update a panel
+      parameters:
+        - name: panelId
+          in: path
+          description: ID of panel to update
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Update panel request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePanelRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful update
+      security:
+        - bearer_auth: []
+    delete:
+      tags:
+        - panel
+      summary: Remove a panel
+      parameters:
+        - name: panelId
+          in: path
+          description: ID of panel to remove
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful removal
+      security:
+        - bearer_auth: []
+
+  /countdown:
+    get:
+      tags:
+        - timer
+      summary: List countdown timers
+      parameters:
+        - name: deviceId
+          in: query
+          description: Device to filter countdown timers
+          schema:
+            type: string
+        - name: panelId
+          in: query
+          description: Panel to filter countdown timers
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful retrieval
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Countdown'
+      security:
+        - bearer_auth: []
+    
+    post:
+      tags:
+        - timer
+      summary: Create a countdown timer
+      requestBody:
+        description: Create countdown timer request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCountdownRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Countdown'
+      security:
+        - bearer_auth: []
+
+  /countdown/{countdownId}:
+    get:
+      tags:
+        - timer
+      summary: Get a countdown timer
+      parameters:
+        - name: countdownId
+          in: path
+          description: ID of countdown timer to get
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful retrieval
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Countdown'
+      security:
+        - bearer_auth: []
+
+    put:
+      tags:
+        - timer
+      summary: Update a countdown timer
+      parameters:
+        - name: countdownId
+          in: path
+          description: ID of countdown timer to update
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Update countdown timer request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCountdownRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful update
+      security:
+        - bearer_auth: []
+
+    delete:
+      tags:
+        - timer
+      summary: Remove a countdown timer
+      parameters:
+        - name: countdownId
+          in: path
+          description: ID of countdown timer to remove
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful removal
+      security:
+        - bearer_auth: []
+
+  /schedule:
+    get:
+      tags:
+        - timer
+      summary: List timers
+      parameters:
+        - name: tag
+          in: query
+          description: Tag to filter timers
+          schema:
+            type: string
+            example: sekisui
+        - name: familyId
+          in: query
+          description: Family to filter timers
+          schema:
+            type: string
+        - name: deviceId
+          in: query
+          description: Device to filter timers
+          schema:
+            type: string
+        - name: panelId
+          in: query
+          description: Panel to filter timers
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful retrieval
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Timer'
+      security:
+        - bearer_auth: []
+    post:
+      tags:
+        - timer
+      summary: Create a timer
+      requestBody:
+        description: Create timer request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTimerRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful creation of a timer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timer'
+      security:
+        - bearer_auth: []
+  
+  /schedule/{timerId}:
+    get:
+      tags:
+        - timer
+      summary: Get a timer
+      parameters:
+        - name: timerId
+          in: path
+          description: ID of timer to get
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful retrieval
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timer'
+      security:
+        - bearer_auth: []
+    put:
+      tags:
+        - timer
+      summary: Update a timer
+      parameters:
+        - name: timerId
+          in: path
+          description: ID of timer to update
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Update timer request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTimerRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful update
+      security:
+        - bearer_auth: []
+
+    delete:
+      tags:
+        - timer
+      summary: Remove a timer
+      parameters:
+        - name: timerId
+          in: path
+          description: ID of timer to remove
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful removal
+      security:
+        - bearer_auth: []
+          
+
 components:
   schemas:
     LoginRequest:
@@ -598,6 +941,184 @@ components:
             endpointId:
               type: string
         
+    Panel:
+      type: object
+      properties:
+        brandId:
+          type: number
+        codeSpecId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        customCodes:
+          type: object
+          example: null
+        deviceId:
+          type: string
+        familyId:
+          type: string
+        hidden:
+          type: boolean
+          example: null
+        id:
+          type: string
+        linked:
+          type: boolean
+          example: false
+        name:
+          type: string
+        order:
+          type: number
+          example: null
+        roomId:
+          type: string
+        state:
+          type: object
+        type:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        userId:
+          type: string
+    
+    CreatePanelRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        familyId:
+          type: string
+        roomId:
+          type: string
+        deviceId:
+          type: string
+        type:
+          type: string
+        brandId:
+          type: number
+        codeSpecId:
+          type: string
+        customCodes:
+          type: object
+          example: null
+      
+    UpdatePanelRequest:
+      type: object
+      properties:
+        hidden:
+          type: boolean
+        name:
+          type: string
+        roomId:
+          type: string
+        order:
+          type: number
+        
+    CountdownOffAction:
+      type: object
+      properties:
+        delay:
+          type: number
+          example: null
+        deviceId:
+          type: string
+        extraInfo:
+          type: object
+          example: null
+        irCode:
+          type: object
+          example: null
+        irCodeKey:
+          type: object
+          example: null
+        operation:
+          type: string
+          enum: [off, on]
+        panelId:
+          type: string
+          example: null
+        panelType:
+          type: string
+          example: null
+        sceneId:
+          type: string
+          example: null
+        type:
+          type: string
+
+    Countdown:
+      type: object
+      properties:
+        createdAt:
+          type: string
+          format: date-time
+        id:
+          type: string
+        offAction:
+          $ref: '#/components/schemas/CountdownOffAction'
+        seconds:
+          type: number
+        updatedAt:
+          type: string
+          format: date-time
+        userId:
+          type: string
+        willTriggerAt:
+          type: string
+          format: date-time
+    
+    CreateCountdownRequest:
+      type: object
+      properties:
+        offAction:
+          $ref: '#/components/schemas/CountdownOffAction'
+        seconds:
+          type: number
+          example: 3600
+          
+    UpdateCountdownRequest:
+      type: object
+
+    Timer:
+      type: object
+
+    CreateTimerRequest:
+      type: object
+      properties:
+        cron:
+          type: string
+        nthWeekOfMonth:
+          type: number
+        timezone:
+          type: string
+        actions:
+          type: array
+          items:
+            type: object
+        enabled:
+          type: boolean
+        tag:
+          type: string
+          example: fridge
+      
+    UpdateTimerRequest:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        timezone:
+          type: string
+          example: null
+        cron:
+          type: string
+          example: null
+        actions:
+          type: object
+          example: null
+    
+
   securitySchemes:
     bearer_auth:
       type: http
