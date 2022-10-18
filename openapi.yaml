@@ -15,13 +15,18 @@ servers:
   - url: https://elife-api.aiscloud.linkjapan.co.jp/api/elife
 tags:
   - name: account
-    description: Everything about your account
+    description: An account represent you on the eLife API, and allow access to controlling your devices.
   - name: family
-    description: Everything about your family
+    description: A family represents a home, usually a physical building that groups a set of devices together.
+  - name: room
   - name: device
-    description: Everything about your devices
+    description: A device is an specific appliance, such as a light, air conditioner, heater, etc.
   - name: smartplug
     description: Control your smart plug such as the Iris Ohyama SMT-PL1
+  - name: panel
+    description: A panel groups controls for a set of devices together.
+  - name: timer
+    description: A timer implements automation for your devices to control them based on different conditions. 
 
 paths:
   /account/login:
@@ -42,7 +47,122 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LoginResponse'
+                $ref: '#/components/schemas/AccountInfo'
+
+  /account/features:
+    get:
+      tags:
+        - account
+      summary: Read account features
+      responses:
+        '200':
+          description: Successful retrieval
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountFeaturesResponse'
+      security:
+        - bearer_auth: []
+
+  /account/me:
+    get:
+      tags:
+        - account
+      summary: Read account information
+      responses:
+        '200':
+          description: Successful retrieval
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountInfo'
+      security:
+        - bearer_auth: []
+    put:
+      tags:
+        - account
+      responses:
+        '200':
+          description: Successful action
+  
+  /account/change-email:
+    post:
+      tags:
+        - account
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeEmailRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful action
+
+  /account/change-password:
+    post:
+      tags:
+        - account
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful action
+
+  /account/delete-me:
+    delete:
+      tags:
+        - account
+      responses:
+        '200':
+          description: Successful action
+
+  /account/register:
+    post:
+      tags:
+        - account
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterAccountRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful action
+
+  /account/reset-password:
+    post:
+      tags:
+        - account
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful action
+
+  /account/send-code:
+    post:
+      tags:
+        - account
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendCodeRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful action
+
   /family:
     get:
       tags:
@@ -57,6 +177,16 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Family'
+      security:
+        - bearer_auth: []
+
+    post:
+      tags:
+        - family
+      summary: Create a family
+      responses:
+        '200':
+          description: Successful action
       security:
         - bearer_auth: []
         
@@ -82,7 +212,120 @@ paths:
                 $ref: '#/components/schemas/Family'
       security:
         - bearer_auth: []
-  
+
+    put:
+      tags:
+        - family
+      summary: Update a family
+      parameters:
+        - name: familyId
+          in: path
+          description: ID of family to update
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful action
+      security:
+        - bearer_auth: []
+
+    delete:
+      tags:
+        - family
+      summary: Delete a family
+      parameters:
+        - name: familyId
+          in: path
+          description: ID of family to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful action
+      security:
+        - bearer_auth: []
+
+  /room:
+    get:
+      tags:
+        - room
+      summary: List all rooms
+      parameters:
+        - name: familyId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful retrieval
+      security:
+        - bearer_auth: []
+    post:
+      tags:
+        - room
+      summary: Create a room
+      responses:
+        '200':
+          description: Successful action
+      security:
+        - bearer_auth: []
+
+  /room/{roomId}:
+    get:
+      tags:
+        - room
+      summary: Find room by ID
+      description: Returns a single room
+      parameters:
+        - name: roomId
+          in: path
+          description: ID of room to return
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful retrieval
+      security:
+        - bearer_auth: []
+
+    put:
+      tags:
+        - room
+      summary: Update a room
+      parameters:
+        - name: roomId
+          in: path
+          description: ID of room to update
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful action
+      security:
+        - bearer_auth: []
+
+    delete:
+      tags:
+        - room
+      summary: Delete a room
+      parameters:
+        - name: roomId
+          in: path
+          description: ID of room to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful action
+      security:
+        - bearer_auth: []
+
   /device:
     get:
       tags:
@@ -104,6 +347,22 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Device'
+      security:
+        - bearer_auth: []
+    post:
+      tags:
+        - device
+      summary: Create a device
+      requestBody:
+        description: Create request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDeviceRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful action
       security:
         - bearer_auth: []
 
@@ -129,6 +388,38 @@ paths:
                 $ref: '#/components/schemas/Device'
       security:
         - bearer_auth: []
+    put:
+      tags:
+        - device
+      summary: Update a device
+      parameters:
+        - name: deviceId
+          in: path
+          description: ID of the device to update
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful action
+      security:
+        - bearer_auth: []
+    delete:
+      tags:
+        - device
+      parameters:
+        - name: deviceId
+          in: path
+          description: ID of the device to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful action
+      security:
+        - bearer_auth: []
+      
 
   /device/{deviceId}/online:
     get:
@@ -153,6 +444,30 @@ paths:
       security:
         - bearer_auth: []
 
+  /device/{deviceId}/control:
+    post:
+      tags:
+        - device
+      parameters:
+        - name: deviceId
+          in: path
+          description: ID of the device to control
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Control request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ControlDeviceRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful retrieval
+      security:
+        - bearer_auth: []
+        
   /device/{deviceId}/data:
     get:
       tags:
@@ -267,6 +582,17 @@ paths:
                 $ref: '#/components/schemas/FirmwareResponse'
       security:
         - bearer_auth: []
+
+  /broadlink/ircode/learncode:
+    post:
+      tags:
+        - smartplug
+      responses:
+        '200':
+          description: Successful action
+      security:
+        - bearer_auth: []
+
 
   /panel:
     get:
@@ -609,7 +935,203 @@ paths:
           description: Successful removal
       security:
         - bearer_auth: []
-          
+
+  /scene:
+    get:
+      parameters:
+        - name: familyId
+          in: query
+          description: Family to get scenes for
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful retrieval
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Scene'
+      security:
+        - bearer_auth: []
+
+    post:
+      responses:
+        '200':
+          description: Successful action
+      security:
+        - bearer_auth: []
+  
+  /scene/{sceneId}:
+    get:
+      parameters:
+        - name: sceneId
+          in: path
+          description: ID of scene to return
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful retrieval
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Scene'
+      security:
+        - bearer_auth: []
+
+    put:
+      parameters:
+        - name: sceneId
+          in: path
+          description: ID of scene to update
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful action
+      security:
+        - bearer_auth: []
+
+    delete:
+      parameters:
+        - name: sceneId
+          in: path
+          description: ID of family to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful action
+      security:
+        - bearer_auth: []
+
+  /linkage/trigger:
+    get:
+      parameters:
+        - name: familyId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful retrieval
+      security:
+        - bearer_auth: []
+
+    post:
+      responses:
+        '200':
+          description: Successful action
+      security:
+        - bearer_auth: []
+
+  /notification/clearBadge:
+    post:
+      responses:
+        '200':
+          description: Successful action
+      security:
+        - bearer_auth: []
+
+  /notification/registerDeviceToken:
+    post:
+      responses:
+        '200':
+          description: Successful action
+      security:
+        - bearer_auth: []
+
+  /notification/revokeDeviceToken:
+    post:
+      responses:
+        '200':
+          description: Successful action
+      security:
+        - bearer_auth: []
+
+  /notification/message:
+    get:
+      responses:
+        '200':
+          description: Successful retrieval
+      security:
+        - bearer_auth: []
+
+  /notification/message/markRead:
+    put:
+      responses:
+        '200':
+          description: Successful action
+      security:
+        - bearer_auth: []
+
+  /notification/broadcastMessage:
+    get:
+      responses:
+        '200':
+          description: Successful retrieval
+      security:
+        - bearer_auth: []
+
+  /notification/broadcastMessage/markRead:
+    put:
+      responses:
+        '200':
+          description: Successful action
+      security:
+        - bearer_auth: []
+
+  /notification/trigger:
+    get:
+      responses:
+        '200':
+          description: Successful retrieval
+      security:
+        - bearer_auth: []
+
+    post:
+      responses:
+        '200':
+          description: Successful action
+      security:
+        - bearer_auth: []
+        
+  /log:
+    post:
+      responses:
+        '200':
+          description: Successful action
+      security:
+        - bearer_auth: []
+
+  /operation-log:
+    get:
+      responses:
+        '200':
+          description: Successful retrieval
+      security:
+        - bearer_auth: []
+  
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogOperationRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful action
+      security:
+        - bearer_auth: []
+    
 
 components:
   schemas:
@@ -628,7 +1150,7 @@ components:
         email: "user@example.com"
         password: "mypassword"
         app: "HomeLink"
-    LoginResponse:
+    AccountInfo:
       type: object
       properties:
         app:
@@ -640,6 +1162,7 @@ components:
           format: date-time
         email:
           type: string
+          format: email
         id:
           type: string
         lastLoginAt:
@@ -655,6 +1178,10 @@ components:
         updatedAt:
           type: string
           format: date-time
+        vendorAccounts:
+          type: array
+          items:
+            type: object
       example:
         app: "HomeLink"
         company: null
@@ -667,7 +1194,73 @@ components:
         permissions: null
         token: "00000000000000000006"
         updatedAt: "2022-08-01T00:00:00.000Z"
-          
+
+    AccountFeaturesResponse:
+      type: object
+      properties:
+        backgroundGPS:
+          type: boolean
+          example: false
+    
+    ChangeEmailRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        verificationCode:
+          type: string
+        
+    ChangePasswordRequest:
+      type: object
+      properties:
+        oldPassword:
+          type: string
+          format: password
+        password:
+          type: string
+          format: password
+
+    RegisterAccountRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        company:
+          type: string
+        password:
+          type: string
+          format: password
+        verificationCode:
+          type: string
+        app:
+          type: string
+
+    ResetPasswordRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        verificationCode:
+          type: string
+        app:
+          type: string
+
+    SendCodeRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        type:
+          type: string
+          enum: [register, reset_password, change_email]
+
     Family:
       type: object
       properties:
@@ -755,6 +1348,42 @@ components:
         updatedAt: "2022-08-01T00:00:00.000Z"
         userId: "000000000000000000000002"
         vendor: "broadlink"
+
+    CreateDeviceRequest:
+      type: object
+      properties:
+        parentId:
+          type: string
+          example: null
+        name:
+          type: string
+        familyId:
+          type: string
+        roomId:
+          type: string
+        vendor:
+          type: string
+        pid:
+          type: string
+        did:
+          type: string
+        extraInfo:
+          type: object
+        
+    ControlDeviceRequest:
+      type: object
+      properties:
+        deviceId:
+          type: string
+        type:
+          type: string
+          example: ""
+        operation:
+          type: string
+          example: "control"
+        extraInfo:
+          type: object
+
     DeviceData:
       type: object
       properties:
@@ -1117,6 +1746,50 @@ components:
         actions:
           type: object
           example: null
+    
+    Scene:
+      type: object
+      properties:
+        actions:
+          type: array
+          items:
+            type: object
+        createdAt:
+          type: string
+          format: date-time
+        familyId:
+          type: string          
+        hidden:
+          type: boolean
+        id:
+          type: string          
+        name:
+          type: string          
+        order:
+          type: number
+          example: null
+        type:
+          type: number
+        updatedAt:
+          type: string
+          format: date-time
+        userId:
+          type: string          
+
+    LogOperationRequest:
+      type: object
+      properties:
+        deviceId:
+          type: string
+        panelId:
+          type: string
+        operationKey:
+          type: string
+          enum: [on, off, mode, switch, temp_add, temp_sub, wind_speed]
+        note:
+          type: string
+        extraInfo:
+          type: object
     
 
   securitySchemes:
